@@ -3,13 +3,32 @@ import { getAllPostIds, getPostData } from '../../lib/posts'
 import Head from 'next/head'
 import Date from '../../components/date'
 import utilStyles from '../../styles/utils.module.css'
+import { useState, useEffect } from "react";
+
 
 const Post = ({ postData }) => {
+
+  // usestateでデータ確保
+  const [data, setData] = useState(null);
+
+  // 自作API叩く関数
+  const getDataFromAPI = async () => {
+    const result = await fetch(`../api/hello`);
+    const data = await result.json();
+    setData(data);
+    return data;
+  }
+
+  useEffect(() => {
+    getDataFromAPI();
+  }, []);
+
   return (
     <Layout>
       <Head>
         <title>{postData.title}</title>
       </Head>
+      <p>{data?.text}</p>
       <article>
         <h1 className={utilStyles.headingXl}>{postData.title}</h1>
         <div className={utilStyles.lightText}>
@@ -20,6 +39,7 @@ const Post = ({ postData }) => {
     </Layout>
   )
 }
+
 
 export const getStaticPaths = async () => {
   // id としてとりうる値のリストを返す
