@@ -5,8 +5,9 @@ import { getSortedPostsData } from '../lib/posts'
 import Link from 'next/link'
 import Date from '../components/date'
 import { useState, useEffect } from "react";
+import { GetStaticProps } from 'next'
 
-export const getStaticProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   const allPostsData = getSortedPostsData()
   return {
     props: {
@@ -15,7 +16,13 @@ export const getStaticProps = async () => {
   }
 }
 
-const Home = ({ allPostsData }) => {
+const Home = ({ allPostsData }: {
+  allPostsData: {
+    date: string
+    title: string
+    id: string
+  }[]
+}) => {
   // usestateでデータ確保
   const [data, setData] = useState(null);
 
