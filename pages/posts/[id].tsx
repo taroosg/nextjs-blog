@@ -35,6 +35,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const paths = getAllPostIds()
   return {
     paths: [],
+    // ISRする．リクエスト毎にビルドして，完了したらデータを返す
     fallback: 'blocking',
   }
 }

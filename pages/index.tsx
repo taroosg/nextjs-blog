@@ -9,8 +9,9 @@ import useSWR from 'swr';
 
 // 位置情報取得関数
 const fetcher = () => {
+  // getCurrentPositionは返り値なしなのでPromiseで実装
   return new Promise((resolve, reject) => {
-    async function onSuccess(position) {
+    const onSuccess = async (position) => {
       const result = await fetch(`../api/hello?lat=${position?.coords?.latitude}&lon=${position?.coords?.longitude}`);
       const data = await result.json();
       resolve(data);
@@ -41,7 +42,8 @@ const Home = ({ allPostsData }: {
   }[]
 }) => {
 
-  // swrでクライアントからデータ取得
+  // swrでクライアントからデータ取得してdataに入れる
+  // 指定したタイミングでfetcher関数を実行してくれる
   const { data: data } = useSWR("geolocation", fetcher, {
     // 初期データ
     initialData: null,
