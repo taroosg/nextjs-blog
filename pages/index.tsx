@@ -57,7 +57,7 @@ const Home = ({ allPostsData }: {
   const GetWeather = ({ data }) => {
     return (
       <section>
-        <p>Hi, today is...</p>
+        <p>Hi, 🌍{data?.name} is...</p>
         <p>🌤: {data?.weather[0]?.description}</p>
         <p>🌡: {data?.main?.temp} ℃</p>
         <p>🌀: {data?.main?.pressure} hPa</p>
