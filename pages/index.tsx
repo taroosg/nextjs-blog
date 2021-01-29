@@ -66,9 +66,7 @@ const Home = ({ allPostsData }: {
       <section>
         <p>Hi, today is...</p>
         <p>🌤: {data?.weather[0]?.description}</p>
-        <p>🔼: {data?.main?.temp_max} ℃</p>
         <p>🌡: {data?.main?.temp} ℃</p>
-        <p>🔽: {data?.main?.temp_min} ℃</p>
         <p>🌀: {data?.main?.pressure} hPa</p>
         <p>💧: {data?.main?.humidity} %</p>
         <p>🌬: {data?.wind?.speed} m/s</p>

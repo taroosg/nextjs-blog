@@ -34,8 +34,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
   // id としてとりうる値のリストを返す
   const paths = getAllPostIds()
   return {
-    paths,
-    fallback: false
+    paths: [],
+    fallback: 'blocking',
   }
 }
 
@@ -45,7 +45,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       postData
-    }
+    },
+    revalidate: 60,
   }
 }
 
