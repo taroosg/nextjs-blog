@@ -4,8 +4,25 @@ import utilStyles from '../styles/utils.module.css'
 import { getSortedPostsData } from '../lib/posts'
 import Link from 'next/link'
 import Date from '../components/date'
-import { useState, useEffect } from "react";
 import { GetStaticProps } from 'next'
+import useSWR from 'swr';
+
+// 位置情報取得関数
+const fetcher = () => {
+  return new Promise((resolve, reject) => {
+    async function onSuccess(position) {
+      const result = await fetch(`../api/hello?lat=${position?.coords?.latitude}&lon=${position?.coords?.longitude}`);
+      const data = await result.json();
+      resolve(data);
+    }
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 60000,
+      maximumAge: 30000,
+    };
+    navigator.geolocation.getCurrentPosition(onSuccess, reject, options);
+  });
+}
 
 export const getStaticProps: GetStaticProps = async () => {
   const allPostsData = getSortedPostsData()
@@ -23,33 +40,30 @@ const Home = ({ allPostsData }: {
     id: string
   }[]
 }) => {
-  // usestateでデータ確保
-  const [data, setData] = useState(null);
 
-  // 自作API叩く関数
-  const getDataFromAPI = async (position) => {
-    console.log(position)
-    const result = await fetch(`../api/hello?lat=${position.coords.latitude}&lon=${position.coords.longitude}`);
-    const data = await result.json();
-    setData(data);
-    return data;
+  // swrでクライアントからデータ取得
+  const { data: data } = useSWR("geolocation", fetcher, {
+    // 初期データ
+    initialData: null,
+    // pollingの期間
+    refreshInterval: 0,
+    // windowのフォーカス時にRevalidateする
+    revalidateOnFocus: true,
+  });
+
+  // 天気のコンポーネント
+  const GetWeather = ({ data }) => {
+    return (
+      <section>
+        <p>Hi, today is...</p>
+        <p>🌤: {data?.weather[0]?.description}</p>
+        <p>🌡: {data?.main?.temp} ℃</p>
+        <p>🌀: {data?.main?.pressure} hPa</p>
+        <p>💧: {data?.main?.humidity} %</p>
+        <p>🌬: {data?.wind?.speed} m/s</p>
+      </section>
+    );
   };
-
-  const showError = () => {
-    alert(`oops!`);
-    return false;
-  };
-
-  const option = {
-    enableHighAccuracy: true,
-    timeout: 500000000,
-    maximumAge: 30000,
-  };
-
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(getDataFromAPI, showError, option);
-    // getDataFromAPI();
-  }, []);
 
   return (
     <Layout home>
@@ -63,14 +77,11 @@ const Home = ({ allPostsData }: {
           <a href="https://nextjs.org/learn">our Next.js tutorial</a>.)
         </p> */}
       </section>
-      <section>
-        <p>Hi, today is...</p>
-        <p>🌤: {data?.weather[0]?.description}</p>
-        <p>🌡: {data?.main?.temp} ℃</p>
-        <p>🌀: {data?.main?.pressure} hPa</p>
-        <p>💧: {data?.main?.humidity} %</p>
-        <p>🌬: {data?.wind?.speed} m/s</p>
-      </section>
+      {
+        !data
+          ? 'loading...'
+          : <GetWeather data={data} />
+      }
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
         <h2 className={utilStyles.headingLg}>Blog</h2>
         <ul className={utilStyles.list}>
