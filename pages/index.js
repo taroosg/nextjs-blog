@@ -4,6 +4,7 @@ import utilStyles from '../styles/utils.module.css'
 import { getSortedPostsData } from '../lib/posts'
 import Link from 'next/link'
 import Date from '../components/date'
+import { useState, useEffect } from "react";
 
 export const getStaticProps = async () => {
   const allPostsData = getSortedPostsData()
@@ -15,17 +16,55 @@ export const getStaticProps = async () => {
 }
 
 const Home = ({ allPostsData }) => {
+  // usestateでデータ確保
+  const [data, setData] = useState(null);
+
+  // 自作API叩く関数
+  const getDataFromAPI = async (position) => {
+    console.log(position)
+    const result = await fetch(`../api/hello?lat=${position.coords.latitude}&lon=${position.coords.longitude}`);
+    const data = await result.json();
+    setData(data);
+    return data;
+  };
+
+  const showError = () => {
+    alert(`oops!`);
+    return false;
+  };
+
+  const option = {
+    enableHighAccuracy: true,
+    timeout: 500000000,
+    maximumAge: 30000,
+  };
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(getDataFromAPI, showError, option);
+    // getDataFromAPI();
+  }, []);
+
   return (
     <Layout home>
       <Head>
         <title>{siteTitle}</title>
       </Head>
       <section className={utilStyles.headingMd}>
-        <p>[Your Self Introduction]</p>
-        <p>
+        <p>G's ACADEMY FUKUOKA Chief Lecturer</p>
+        {/* <p>
           (This is a sample website - you’ll be building a site like this on{' '}
           <a href="https://nextjs.org/learn">our Next.js tutorial</a>.)
-        </p>
+        </p> */}
+      </section>
+      <section>
+        <p>Hi, today is...</p>
+        <p>🌤: {data?.weather[0]?.description}</p>
+        <p>🔼: {data?.main?.temp_max} ℃</p>
+        <p>🌡: {data?.main?.temp} ℃</p>
+        <p>🔽: {data?.main?.temp_min} ℃</p>
+        <p>🌀: {data?.main?.pressure} hPa</p>
+        <p>💧: {data?.main?.humidity} %</p>
+        <p>🌬: {data?.wind?.speed} m/s</p>
       </section>
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
         <h2 className={utilStyles.headingLg}>Blog</h2>

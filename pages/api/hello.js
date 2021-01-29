@@ -5,6 +5,9 @@
 // クライアントサイドで実行されることはなく，ブラウザ用のJSバンドルに含まれることもない．
 // これはデータベースに直接問い合わせるようなコードを書くことができ，そういったコードがブラウザ側に送られることは無いということ．
 
-export default (req, res) => {
-  res.status(200).json({ text: 'Hello' })
+export default async (req, res) => {
+  const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${req.query.lat}&lon=${req.query.lon}&units=metric&appid=${process.env.OPEN_WEATHER_API_KEY}`);
+  const weather = await response.json();
+  res.status(200).json(weather);
+  // res.status(200).json({ text: 'Hello' })
 }
